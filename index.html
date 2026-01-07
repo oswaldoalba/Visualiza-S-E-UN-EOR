@@ -815,6 +815,35 @@
                 if (layerControl) layerControl.addOverlay(lineLayer, 'Líneas Subtransmisión');
             })
             .catch(err => console.error('Error cargando LineaSubtransmision.geojson:', err));
-    </script>
+    
+            // Cargar y añadir Estructura_69KV.geojson (estructuras 69KV), oculta por defecto
+            fetch('Estructura_69KV.geojson')
+                .then(resp => resp.json())
+                .then(data => {
+                    const estructuraLayer = L.geoJSON(data, {
+                        pointToLayer: function(feature, latlng) {
+                            return L.circleMarker(latlng, {
+                                radius: 5,
+                                fillColor: '#2ecc71',
+                                color: '#ffffff',
+                                weight: 1,
+                                opacity: 1,
+                                fillOpacity: 0.9
+                            });
+                        },
+                        onEachFeature: function(feature, layer) {
+                            const props = feature.properties || {};
+                            const title = props.NOMBRE || props.name || props.nombre || 'Estructura 69KV';
+                            const popup = `<div class="popup-header">${title}</div>`;
+                            layer.bindPopup(popup);
+                        }
+                    });
+
+                    // No usamos .addTo(map) para que quede oculta por defecto
+                    overlays['Estructuras 69KV'] = estructuraLayer;
+                    if (layerControl) layerControl.addOverlay(estructuraLayer, 'Estructuras 69KV');
+                })
+                .catch(err => console.error('Error cargando Estructura_69KV.geojson:', err));
+</script>
 </body>
 </html>
